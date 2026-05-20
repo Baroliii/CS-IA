@@ -1,89 +1,1153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veloce Dynamics | STEM Racing Team</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veloce Dynamics — STEM Racing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #00C8FF;
+    --accent-dim: #0099cc;
+    --bg: #080809;
+    --bg2: #0f0f12;
+    --bg3: #161619;
+    --text: #ffffff;
+    --muted: #8888a0;
+    --border: rgba(255,255,255,0.08);
+    --nav-h: 72px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    transition: background 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(8,8,9,0.95);
+    backdrop-filter: blur(12px);
+    border-color: var(--border);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .nav-logo-mark {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    clip-path: polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%);
+    flex-shrink: 0;
+  }
+  .nav-logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .nav-logo-sub {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    background: var(--accent);
+    color: var(--bg) !important;
+    padding: 8px 20px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    font-weight: 700 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: #00aadd; color: var(--bg) !important; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 640px;
+    overflow: hidden;
+  }
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 40px 100px;
+  }
+  .hero-slide.active { opacity: 1; }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+  .hero-slide.active .hero-bg { transform: scale(1); }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(8,8,9,0.92) 0%, rgba(8,8,9,0.4) 40%, rgba(8,8,9,0.15) 100%);
+  }
+  .slide-1 .hero-bg { background-color: #050d1a; background-image: radial-gradient(ellipse 80% 60% at 60% 40%, #083050 0%, #080809 70%); }
+  .slide-2 .hero-bg { background-color: #030d1f; background-image: radial-gradient(ellipse 80% 60% at 40% 50%, #052540 0%, #080809 70%); }
+  .slide-3 .hero-bg { background-color: #05121a; background-image: radial-gradient(ellipse 80% 60% at 55% 35%, #063545 0%, #080809 70%); }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+  }
+  .hero-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-label::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--accent);
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 8vw, 110px);
+    line-height: 0.92;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  .hero-title em { display: block; color: var(--accent); font-style: normal; }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 480px;
+    margin-bottom: 32px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 14px 28px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: background 0.2s, gap 0.2s;
+  }
+  .hero-cta:hover { background: #00aadd; gap: 16px; }
+  .hero-cta svg { width: 16px; height: 16px; }
+  .hero-indicators {
+    position: absolute;
+    bottom: 40px; right: 40px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  .indicator {
+    width: 32px; height: 2px;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: background 0.3s, width 0.3s;
+    border: none;
+  }
+  .indicator.active { background: var(--accent); width: 52px; }
+  .hero-counter {
+    position: absolute;
+    bottom: 44px; left: 40px;
+    z-index: 10;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+  .hero-counter strong { color: var(--accent); }
+
+  /* SHARED */
+  section { padding: 100px 40px; }
+  .section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::before { content: ''; width: 28px; height: 1px; background: var(--accent); flex-shrink: 0; }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+  }
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+    transition: gap 0.2s;
+  }
+  .link-arrow:hover { gap: 14px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--accent);
+    padding: 0 40px;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+  }
+  .stat-item {
+    flex: 1;
+    padding: 28px 40px;
+    border-right: 1px solid rgba(8,8,9,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--bg);
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+  .stat-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(8,8,9,0.55);
+    font-weight: 600;
+  }
+
+  /* NEWS */
+  .news-section { background: var(--bg2); }
+  .news-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2px;
+  }
+  .news-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg3);
+    text-decoration: none;
+    display: block;
+  }
+  .news-card:first-child { grid-row: 1 / 3; min-height: 500px; }
+  .news-card-img-placeholder {
+    width: 100%;
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 13px;
+    transition: transform 0.6s ease;
+    overflow: hidden;
+  }
+  .news-card:first-child .news-card-img-placeholder {
+    position: absolute; inset: 0; height: 100%;
+  }
+  .news-card:hover .news-card-img-placeholder { transform: scale(1.04); }
+  .ph-1 { background: radial-gradient(ellipse at 60% 40%, #083a50 0%, #080809 80%); }
+  .ph-2 { background: radial-gradient(ellipse at 40% 60%, #102030 0%, #080809 80%); }
+  .ph-3 { background: radial-gradient(ellipse at 60% 50%, #062035 0%, #080809 80%); }
+  .ph-4 { background: radial-gradient(ellipse at 50% 40%, #061830 0%, #080809 80%); }
+  .ph-graphic { opacity: 0.18; width: 60%; max-width: 280px; }
+  .news-card-body {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px;
+    background: linear-gradient(to top, rgba(8,8,9,0.95) 0%, rgba(8,8,9,0.5) 60%, transparent 100%);
+    z-index: 2;
+  }
+  .news-tag {
+    display: inline-block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .news-card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .news-card:first-child .news-card-title { font-size: 28px; }
+  .news-date { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
+
+  /* COUNTDOWN */
+  .countdown-section {
+    background: var(--bg3);
+    padding: 80px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .countdown-event-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .countdown-event-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .countdown-timer { display: flex; gap: 4px; align-items: stretch; }
+  .countdown-unit { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: 2px;
+    min-width: 80px;
+    text-align: center;
+  }
+  .countdown-unit-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .countdown-sep {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 1;
+    color: rgba(255,255,255,0.15);
+    padding: 0 4px;
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+
+  /* ABOUT */
+  .about-section {
+    background: var(--bg);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 100px 40px;
+  }
+  .about-visual {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: var(--bg3);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .about-visual-inner {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, #083a50 0%, #080809 70%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-accent-line {
+    position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--accent);
+  }
+  .about-badge {
+    position: absolute; bottom: 24px; right: 24px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .about-text p {
+    color: rgba(255,255,255,0.65);
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .about-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 36px;
+  }
+  .about-feature { display: flex; gap: 12px; align-items: flex-start; }
+  .feature-icon {
+    width: 36px; height: 36px;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+  .feature-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
+  .feature-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text); line-height: 1.2; margin-bottom: 3px;
+  }
+  .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* TEAM */
+  .team-section { background: var(--bg2); }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 48px;
+  }
+  .team-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    background: var(--bg3);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+  .team-card-bg { position: absolute; inset: 0; transition: transform 0.6s ease; }
+  .team-card:hover .team-card-bg { transform: scale(1.04); }
+  .tc-1 { background: radial-gradient(ellipse at 50% 30%, #083a50 0%, #050806 80%); }
+  .tc-2 { background: radial-gradient(ellipse at 50% 30%, #082840 0%, #050806 80%); }
+  .tc-3 { background: radial-gradient(ellipse at 50% 30%, #062035 0%, #050806 80%); }
+  .team-card-number {
+    position: absolute; top: 20px; right: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px; line-height: 1;
+    color: rgba(0,200,255,0.08);
+    letter-spacing: -2px; z-index: 1;
+  }
+  .team-card-body {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 24px;
+    background: linear-gradient(to top, rgba(5,8,6,0.98) 0%, transparent 100%);
+    z-index: 2;
+  }
+  .team-role {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+  }
+  .team-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px;
+  }
+  .team-info { font-size: 13px; color: var(--muted); }
+  .team-accent-bar {
+    position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+  .team-card:hover .team-accent-bar { width: 100%; }
+
+  /* COMPETITIONS */
+  .competition-strip {
+    background: var(--bg);
+    padding: 80px 40px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .comp-card {
+    padding: 28px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .comp-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .comp-card:hover { border-color: rgba(0,200,255,0.25); }
+  .comp-card:hover::before { transform: scaleX(1); }
+  .comp-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; color: rgba(255,255,255,0.05); line-height: 1; margin-bottom: 8px;
+  }
+  .comp-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; color: var(--text); margin-bottom: 8px;
+  }
+  .comp-result {
+    display: inline-block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; color: var(--accent); letter-spacing: 1px;
+  }
+  .comp-desc { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+  /* SPONSORS */
+  .sponsors-section { background: var(--bg2); padding: 80px 40px; }
+  .sponsors-tier { margin-bottom: 40px; }
+  .sponsors-tier-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sponsors-row { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .sponsor-item {
+    padding: 16px 32px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    min-width: 140px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .sponsor-item:hover { border-color: rgba(0,200,255,0.3); background: rgba(0,200,255,0.03); }
+  .sponsor-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+    transition: color 0.3s;
+  }
+  .sponsor-item:hover .sponsor-name { color: rgba(255,255,255,0.7); }
+
+  /* JOIN BANNER */
+  .join-section {
+    position: relative;
+    background: var(--accent);
+    padding: 100px 40px;
+    overflow: hidden;
+  }
+  .join-bg-text {
+    position: absolute; bottom: -40px; right: -20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 260px; line-height: 1;
+    color: rgba(8,8,9,0.06);
+    letter-spacing: -5px;
+    pointer-events: none; white-space: nowrap;
+  }
+  .join-content { position: relative; z-index: 2; max-width: 600px; }
+  .join-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px; letter-spacing: 4px;
+    text-transform: uppercase; color: rgba(8,8,9,0.5);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .join-label::before { content: ''; width: 28px; height: 1px; background: rgba(8,8,9,0.4); }
+  .join-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    color: var(--bg); line-height: 0.95; letter-spacing: 1px; margin-bottom: 20px;
+  }
+  .join-desc { font-size: 16px; color: rgba(8,8,9,0.65); margin-bottom: 36px; line-height: 1.7; }
+  .join-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--bg); color: var(--accent);
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; padding: 14px 28px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: background 0.2s, gap 0.2s;
+  }
+  .join-cta:hover { background: #111; gap: 16px; }
+
+  /* FOOTER */
+  footer { background: #050506; padding: 60px 40px 32px; border-top: 1px solid var(--border); }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .footer-brand p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 16px; max-width: 280px; }
+  .footer-col-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--text); margin-bottom: 20px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-copy { font-size: 13px; color: rgba(255,255,255,0.25); }
+  .social-links { display: flex; gap: 12px; }
+  .social-link {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; color: var(--muted); font-size: 14px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+  .social-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.05); }
+  .social-link svg { width: 16px; height: 16px; }
+
+  /* REVEAL */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    .news-grid { grid-template-columns: 1fr; }
+    .news-card:first-child { grid-row: auto; min-height: 320px; }
+    .about-section { grid-template-columns: 1fr; gap: 40px; padding: 60px 20px; }
+    .team-grid { grid-template-columns: 1fr; }
+    .team-card { aspect-ratio: 4/3; }
+    .comp-grid { grid-template-columns: 1fr 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-item { min-width: 50%; border-bottom: 1px solid rgba(8,8,9,0.15); }
+    .countdown-section { flex-direction: column; align-items: flex-start; }
+  }
+</style>
 </head>
 <body>
 
-    <header id="navbar">
-        <div class="logo">
-            <h1>VELOCE<span>DYNAMICS</span></h1>
-        </div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#news">News</a></li>
-                <li><a href="#team">Our Team</a></li>
-                <li><a href="#car">The Car</a></li>
-            </ul>
-        </nav>
-        <div class="menu-toggle" id="mobile-menu">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </div>
-    </header>
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark"></div>
+    <div>
+      <div class="nav-logo-text">Veloce Dynamics</div>
+      <div class="nav-logo-sub">STEM Racing Team</div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#competitions">Competitions</a></li>
+    <li><a href="#sponsors">Sponsors</a></li>
+    <li><a href="#join" class="nav-cta">Join Us</a></li>
+  </ul>
+</nav>
 
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h2>ENGINEERED FOR SPEED.</h2>
-            <p>Pushing the boundaries of STEM and motorsport innovation.</p>
-            <a href="#car" class="btn">Discover Our Car</a>
-        </div>
-    </section>
+<!-- HERO -->
+<section class="hero" style="padding:0;">
 
-    <section id="news" class="news-section">
-        <div class="section-header">
-            <h2>LATEST UPDATES</h2>
-            <a href="#" class="view-all">View All News &rarr;</a>
-        </div>
-        
-        <div class="news-grid">
-            <div class="news-card">
-                <div class="card-image bg-1"></div>
-                <div class="card-content">
-                    <span class="category">Engineering</span>
-                    <h3>Aerodynamics Package Reveal</h3>
-                    <p>Take a first look at our newly designed front wing optimized for maximum downforce.</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <div class="card-image bg-2"></div>
-                <div class="card-content">
-                    <span class="category">Race Report</span>
-                    <h3>Testing Day Highlights</h3>
-                    <p>Our prototype hit the track for the first time this season. Read the full telemetry report.</p>
-                </div>
-            </div>
-            <div class="news-card">
-                <div class="card-image bg-3"></div>
-                <div class="card-content">
-                    <span class="category">Team</span>
-                    <h3>Meet the Engineers</h3>
-                    <p>Get to know the brilliant minds behind the Veloce Dynamics project.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  <div class="hero-slide slide-1 active">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-label">Season 2025 — 2026</p>
+      <h1 class="hero-title">Engineering<br><em>Victory</em></h1>
+      <p class="hero-desc">Veloce Dynamics builds race cars with cutting-edge STEM principles — where aerodynamics meets code and data drives every decision.</p>
+      <a href="#about" class="hero-cta">
+        Discover Our Story
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="8" x2="14" y2="8"/><polyline points="8,2 14,8 8,14"/></svg>
+      </a>
+    </div>
+  </div>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-logo">
-                <h2>VELOCE<span>DYNAMICS</span></h2>
-            </div>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Contact Us</a>
-            </div>
-        </div>
-        <p class="copyright">&copy; 2026 Veloce Dynamics. All Rights Reserved.</p>
-    </footer>
+  <div class="hero-slide slide-2">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-label">Technical Division</p>
+      <h1 class="hero-title">Precision<br><em>Engineered</em></h1>
+      <p class="hero-desc">Every component of VD-26 is designed with purpose — computational fluid dynamics, lightweight composites, and real-time telemetry.</p>
+      <a href="#team" class="hero-cta">
+        Meet The Team
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="8" x2="14" y2="8"/><polyline points="8,2 14,8 8,14"/></svg>
+      </a>
+    </div>
+  </div>
 
-    <script src="script.js"></script>
+  <div class="hero-slide slide-3">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-label">Upcoming Event</p>
+      <h1 class="hero-title">National<br><em>Finals</em></h1>
+      <p class="hero-desc">The next race is just around the corner. Veloce Dynamics is ready to compete at the 2026 STEM National Racing Finals.</p>
+      <a href="#news" class="hero-cta">
+        Read the Preview
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="8" x2="14" y2="8"/><polyline points="8,2 14,8 8,14"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-indicators">
+    <button class="indicator active" onclick="goSlide(0)"></button>
+    <button class="indicator" onclick="goSlide(1)"></button>
+    <button class="indicator" onclick="goSlide(2)"></button>
+  </div>
+  <div class="hero-counter" id="hero-counter"><strong>01</strong> / 03</div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar reveal">
+  <div class="stat-item"><span class="stat-number">3</span><span class="stat-label">Seasons Competing</span></div>
+  <div class="stat-item"><span class="stat-number">12</span><span class="stat-label">Team Members</span></div>
+  <div class="stat-item"><span class="stat-number">4</span><span class="stat-label">Podium Finishes</span></div>
+  <div class="stat-item"><span class="stat-number">VD-26</span><span class="stat-label">Current Car Build</span></div>
+</div>
+
+<!-- NEWS -->
+<section class="news-section" id="news">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Latest</p>
+      <h2 class="section-title">News & Updates</h2>
+    </div>
+    <a href="#" class="link-arrow">All Stories <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="7" x2="12" y2="7"/><polyline points="7,2 12,7 7,12"/></svg></a>
+  </div>
+  <div class="news-grid reveal">
+    <a href="#" class="news-card">
+      <div class="news-card-img-placeholder ph-1">
+        <svg class="ph-graphic" viewBox="0 0 320 120" fill="none" stroke="white" stroke-width="1.5">
+          <path d="M30 80 L60 55 L100 48 L200 48 L240 55 L280 62 L295 72 L295 80 Z"/>
+          <ellipse cx="80" cy="84" rx="18" ry="14"/>
+          <ellipse cx="240" cy="84" rx="18" ry="14"/>
+          <path d="M100 48 L115 32 L190 32 L205 48"/>
+          <path d="M140 48 L140 32"/><path d="M250 62 L265 52 L290 58"/>
+          <path d="M50 68 L30 58 L20 62 L28 72"/>
+        </svg>
+      </div>
+      <div class="news-card-body">
+        <span class="news-tag">Feature</span>
+        <h3 class="news-card-title">VD-26 aerodynamic package unveiled — a season-defining upgrade</h3>
+        <span class="news-date">15 May 2026</span>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img-placeholder ph-2" style="aspect-ratio:16/9;"></div>
+      <div class="news-card-body">
+        <span class="news-tag">Technical</span>
+        <h3 class="news-card-title">Our CFD simulation pipeline: how we cut drag by 8%</h3>
+        <span class="news-date">10 May 2026</span>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img-placeholder ph-3" style="aspect-ratio:16/9;"></div>
+      <div class="news-card-body">
+        <span class="news-tag">Announcement</span>
+        <h3 class="news-card-title">Veloce Dynamics announces new title partner for 2026 season</h3>
+        <span class="news-date">3 May 2026</span>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img-placeholder ph-4" style="aspect-ratio:16/9;"></div>
+      <div class="news-card-body">
+        <span class="news-tag">Race Report</span>
+        <h3 class="news-card-title">P2 at the Northern Invitational — debrief and data breakdown</h3>
+        <span class="news-date">28 Apr 2026</span>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img-placeholder ph-1" style="aspect-ratio:16/9; filter:hue-rotate(200deg);"></div>
+      <div class="news-card-body">
+        <span class="news-tag">STEM Outreach</span>
+        <h3 class="news-card-title">School visit programme: inspiring the next generation of engineers</h3>
+        <span class="news-date">20 Apr 2026</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="countdown-section">
+  <div class="reveal">
+    <p class="countdown-event-label">Next Event</p>
+    <h2 class="countdown-event-name">STEM National Finals 2026</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px;">Milton Keynes, UK</p>
+  </div>
+  <div class="countdown-timer reveal reveal-delay-2">
+    <div class="countdown-unit"><span class="countdown-num" id="cd-days">00</span><span class="countdown-unit-label">Days</span></div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-hours">00</span><span class="countdown-unit-label">Hours</span></div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-mins">00</span><span class="countdown-unit-label">Mins</span></div>
+    <span class="countdown-sep">:</span>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-secs">00</span><span class="countdown-unit-label">Secs</span></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-visual reveal">
+    <div class="about-visual-inner">
+      <svg viewBox="0 0 400 300" fill="none" stroke="rgba(0,200,255,0.6)" style="width:80%;max-width:340px;">
+        <path d="M40 200 L80 155 L130 140 L260 140 L310 155 L355 165 L370 185 L370 200 Z" stroke-width="1.2"/>
+        <ellipse cx="110" cy="208" rx="28" ry="22" stroke-width="1.2"/>
+        <ellipse cx="300" cy="208" rx="28" ry="22" stroke-width="1.2"/>
+        <path d="M130 140 L148 112 L240 112 L260 140" stroke-width="1.2"/>
+        <line x1="180" y1="140" x2="180" y2="112" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <line x1="215" y1="140" x2="215" y2="112" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <path d="M340 165 L370 155 L390 162 L385 172" stroke-width="1.2"/>
+        <path d="M60 155 L38 142 L18 150 L25 162" stroke-width="1.2"/>
+        <line x1="40" y1="230" x2="370" y2="230" stroke-width="0.5" stroke-dasharray="4 4" stroke="rgba(0,200,255,0.25)"/>
+        <line x1="40" y1="226" x2="40" y2="234" stroke-width="0.5" stroke="rgba(0,200,255,0.25)"/>
+        <line x1="370" y1="226" x2="370" y2="234" stroke-width="0.5" stroke="rgba(0,200,255,0.25)"/>
+        <text x="200" y="243" text-anchor="middle" fill="rgba(0,200,255,0.35)" font-size="10" font-family="Rajdhani,sans-serif" letter-spacing="2">3,200mm WHEELBASE</text>
+        <circle cx="200" cy="126" r="3" fill="#00C8FF" stroke="none"/>
+        <circle cx="355" cy="170" r="3" fill="#00C8FF" stroke="none"/>
+        <circle cx="110" cy="208" r="3" fill="#00C8FF" stroke="none"/>
+      </svg>
+    </div>
+    <div class="about-accent-line"></div>
+    <div class="about-badge">VD-26 · 2026 SPEC</div>
+  </div>
+  <div class="about-text reveal reveal-delay-2">
+    <p class="section-label">Who We Are</p>
+    <h2 class="section-title">More Than<br>a Racing Team</h2>
+    <p>Veloce Dynamics is a student-led STEM racing team that designs, builds, and races fully engineered cars. We compete at national level while developing the engineers and scientists of tomorrow.</p>
+    <p>Our multidisciplinary team spans aerodynamics, mechanical engineering, electronics, data science, and software — united by one goal: go faster, smarter.</p>
+    <div class="about-features">
+      <div class="about-feature">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg></div>
+        <div><div class="feature-label">Aerodynamics</div><div class="feature-desc">CFD simulations & wind tunnel testing</div></div>
+      </div>
+      <div class="about-feature">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 8h10M7 12h6"/></svg></div>
+        <div><div class="feature-label">Data & Telemetry</div><div class="feature-desc">Real-time race analytics platform</div></div>
+      </div>
+      <div class="about-feature">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+        <div><div class="feature-label">Electronics</div><div class="feature-desc">Custom ECU and sensor systems</div></div>
+      </div>
+      <div class="about-feature">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12l3 7-9 12L3 10z"/></svg></div>
+        <div><div class="feature-label">Composites</div><div class="feature-desc">Lightweight carbon fibre structures</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section" id="team">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">The People</p>
+      <h2 class="section-title">Meet The Team</h2>
+    </div>
+    <a href="#" class="link-arrow">Full Roster <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="7" x2="12" y2="7"/><polyline points="7,2 12,7 7,12"/></svg></a>
+  </div>
+  <div class="team-grid">
+    <a href="#" class="team-card reveal">
+      <div class="team-card-bg tc-1"></div>
+      <div class="team-card-number">01</div>
+      <div class="team-card-body">
+        <p class="team-role">Team Principal</p>
+        <h3 class="team-name">Alex Moretti</h3>
+        <p class="team-info">Year 13 · Mechanical Lead</p>
+      </div>
+      <div class="team-accent-bar"></div>
+    </a>
+    <a href="#" class="team-card reveal reveal-delay-1">
+      <div class="team-card-bg tc-2"></div>
+      <div class="team-card-number">02</div>
+      <div class="team-card-body">
+        <p class="team-role">Chief Engineer</p>
+        <h3 class="team-name">Sara Nakamura</h3>
+        <p class="team-info">Year 13 · Aero & Simulation</p>
+      </div>
+      <div class="team-accent-bar"></div>
+    </a>
+    <a href="#" class="team-card reveal reveal-delay-2">
+      <div class="team-card-bg tc-3"></div>
+      <div class="team-card-number">03</div>
+      <div class="team-card-body">
+        <p class="team-role">Software Lead</p>
+        <h3 class="team-name">Jordan Hayes</h3>
+        <p class="team-info">Year 12 · Telemetry & Code</p>
+      </div>
+      <div class="team-accent-bar"></div>
+    </a>
+  </div>
+</section>
+
+<!-- COMPETITIONS -->
+<div class="competition-strip" id="competitions">
+  <div class="section-header reveal" style="margin-bottom:0;">
+    <div>
+      <p class="section-label">Track Record</p>
+      <h2 class="section-title">Our Results</h2>
+    </div>
+  </div>
+  <div class="comp-grid">
+    <div class="comp-card reveal">
+      <div class="comp-year">2024</div>
+      <div class="comp-name">STEM National Finals</div>
+      <div class="comp-result">2nd Place</div>
+      <div class="comp-desc">Silver in our debut season — fastest lap in qualifying.</div>
+    </div>
+    <div class="comp-card reveal reveal-delay-1">
+      <div class="comp-year">2025</div>
+      <div class="comp-name">Northern Invitational</div>
+      <div class="comp-result">1st Place</div>
+      <div class="comp-desc">First ever gold medal — VD-25 dominated the sprint event.</div>
+    </div>
+    <div class="comp-card reveal reveal-delay-2">
+      <div class="comp-year">2025</div>
+      <div class="comp-name">Innovation Award</div>
+      <div class="comp-result">Best Tech</div>
+      <div class="comp-desc">Awarded for our onboard telemetry and data dashboard.</div>
+    </div>
+    <div class="comp-card reveal reveal-delay-3">
+      <div class="comp-year">2026</div>
+      <div class="comp-name">STEM National Finals</div>
+      <div class="comp-result">Upcoming</div>
+      <div class="comp-desc">VD-26 is ready. The title is the target.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SPONSORS -->
+<section class="sponsors-section" id="sponsors">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Partners</p>
+      <h2 class="section-title">Our Sponsors</h2>
+    </div>
+    <a href="#" class="link-arrow">Become a Partner <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="7" x2="12" y2="7"/><polyline points="7,2 12,7 7,12"/></svg></a>
+  </div>
+  <div class="sponsors-tier reveal">
+    <div class="sponsors-tier-label">Title Partner</div>
+    <div class="sponsors-row">
+      <div class="sponsor-item" style="min-width:200px; border-color:rgba(0,200,255,0.25);">
+        <span class="sponsor-name" style="color:rgba(0,200,255,0.7); font-size:18px;">Your Brand Here</span>
+      </div>
+    </div>
+  </div>
+  <div class="sponsors-tier reveal reveal-delay-1">
+    <div class="sponsors-tier-label">Principal Partners</div>
+    <div class="sponsors-row">
+      <div class="sponsor-item"><span class="sponsor-name">Partner A</span></div>
+      <div class="sponsor-item"><span class="sponsor-name">Partner B</span></div>
+      <div class="sponsor-item"><span class="sponsor-name">Partner C</span></div>
+    </div>
+  </div>
+  <div class="sponsors-tier reveal reveal-delay-2">
+    <div class="sponsors-tier-label">Technical Partners</div>
+    <div class="sponsors-row">
+      <div class="sponsor-item"><span class="sponsor-name">Tech Co.</span></div>
+      <div class="sponsor-item"><span class="sponsor-name">Materials Ltd</span></div>
+      <div class="sponsor-item"><span class="sponsor-name">CAD Tools</span></div>
+      <div class="sponsor-item"><span class="sponsor-name">Electronics</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN CTA -->
+<section class="join-section" id="join" style="padding:100px 40px;">
+  <div class="join-bg-text">VELOCE</div>
+  <div class="join-content">
+    <p class="join-label">Be Part Of It</p>
+    <h2 class="join-title">Join Veloce<br>Dynamics</h2>
+    <p class="join-desc">Whether you're passionate about engineering, coding, design, or simply want to be part of a winning team — we want to hear from you. Open to all students.</p>
+    <a href="#" class="join-cta">Apply Now <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="0" y1="8" x2="14" y2="8"/><polyline points="8,2 14,8 8,14"/></svg></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo" style="display:inline-flex;">
+        <div class="nav-logo-mark"></div>
+        <div>
+          <div class="nav-logo-text">Veloce Dynamics</div>
+          <div class="nav-logo-sub">STEM Racing Team</div>
+        </div>
+      </a>
+      <p>A student-led STEM racing team competing at national level, built on engineering excellence and a relentless drive to innovate.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Navigation</p>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#competitions">Competitions</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Information</p>
+      <ul class="footer-links">
+        <li><a href="#sponsors">Sponsors</a></li>
+        <li><a href="#join">Join Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Media</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Car</p>
+      <ul class="footer-links">
+        <li><a href="#">VD-26 Spec</a></li>
+        <li><a href="#">Aerodynamics</a></li>
+        <li><a href="#">Telemetry</a></li>
+        <li><a href="#">Build Diary</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Veloce Dynamics STEM Racing. Computer Science IA Project.</p>
+    <div class="social-links">
+      <a href="#" class="social-link" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" class="social-link" aria-label="X / Twitter">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="#" class="social-link" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 8s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C15.2 4 12 4 12 4s-3.2 0-5.8.2c-.6 0-1.9.1-3 1.3C2.3 6 2 8 2 8S1.7 10.3 1.7 12.5v2.1c0 2.2.3 4.4.3 4.4s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C8.5 23 12 23 12 23s3.2 0 5.8-.2c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.2.3-4.4v-2.1C22.3 10.3 22 8 22 8zM9.7 15.5V9l6.5 3.3-6.5 3.2z"/></svg>
+      </a>
+      <a href="#" class="social-link" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 014 0v4M11 10v7"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  const slides = document.querySelectorAll('.hero-slide');
+  const indicators = document.querySelectorAll('.indicator');
+  const counter = document.getElementById('hero-counter');
+  let current = 0;
+  let autoTimer;
+
+  function goSlide(n) {
+    slides[current].classList.remove('active');
+    indicators[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    indicators[current].classList.add('active');
+    counter.innerHTML = '<strong>' + String(current + 1).padStart(2, '0') + '</strong> / 03';
+  }
+  function nextSlide() { goSlide((current + 1) % slides.length); }
+  function startAuto() { autoTimer = setInterval(nextSlide, 5000); }
+  document.querySelectorAll('.indicator').forEach((btn, i) => {
+    btn.addEventListener('click', () => { clearInterval(autoTimer); goSlide(i); startAuto(); });
+  });
+  startAuto();
+
+  function updateCountdown() {
+    var target = new Date('2026-09-15T09:00:00');
+    var diff = Math.max(target - new Date(), 0);
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+</script>
 </body>
 </html>
