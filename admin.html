@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Admin — Veloce Dynamics</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#00C8FF;--bg:#080809;--bg2:#0f0f12;--muted:#8888a0;--border:rgba(255,255,255,.1);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:#fff;font-family:'Outfit',sans-serif;padding:40px;}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:1px;}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+  #login{max-width:340px;margin:120px auto;text-align:center;}
+  input,select{background:var(--bg2);border:1px solid var(--border);color:#fff;padding:8px 10px;font:inherit;font-size:14px;width:100%;}
+  input[type=checkbox]{width:auto;}
+  button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:8px 14px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+  button:hover{background:var(--accent);color:var(--bg);}
+  button.dl{border-color:#ff6b6b;color:#ff6b6b;} button.dl:hover{background:#ff6b6b;color:var(--bg);}
+  table{width:100%;border-collapse:collapse;} th{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px;}
+  td{padding:6px 8px;border-top:1px solid var(--border);} td:nth-child(5){text-align:center;} td:last-child{white-space:nowrap;}
+  tr.new td{background:rgba(0,200,255,.05);}
+  #msg{min-height:22px;margin-bottom:12px;font-size:14px;} .err{color:#ff6b6b;} .ok{color:var(--accent);}
+  #dash{display:none;}
+</style>
+</head>
+<body>
+<div id="login">
+  <h1>Admin Login</h1>
+  <p style="color:var(--muted);margin:8px 0 20px">Veloce Dynamics shop</p>
+  <input type="password" id="pw" placeholder="Password" style="margin-bottom:12px">
+  <button id="loginBtn" style="width:100%">Log in</button>
+  <p id="loginErr" class="err" style="margin-top:12px"></p>
+</div>
+
+<div id="dash">
+  <div class="top"><h1>Shop Products</h1><div><a href="shop.html" style="color:var(--muted);margin-right:16px">View shop</a><button id="logoutBtn">Log out</button></div></div>
+  <p id="msg"></p>
+  <table>
+    <thead><tr><th>Name</th><th>Category</th><th>Price (£)</th><th>Stock</th><th>Live</th><th></th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const CATS = ['Apparel','Accessories','Stickers'], STOCK = ['In Stock','Low Stock','Sold Out'];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const opts = (arr, sel) => arr.map(o => `<option${o === sel ? ' selected' : ''}>${o}</option>`).join('');
+
+async function api(url, method = 'GET', body) {
+  const r = await fetch(url, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(d.error || 'Request failed'), { status: r.status });
+  return d;
+}
+function say(t, ok) { $('#msg').className = ok ? 'ok' : 'err'; $('#msg').textContent = t; }
+
+function rowHtml(p) {
+  const isNew = !p.id;
+  return `<tr data-id="${esc(p.id || '')}" class="${isNew ? 'new' : ''}">
+    <td><input class="n" value="${esc(p.name || '')}" placeholder="${isNew ? 'New product name' : ''}"></td>
+    <td><select class="c">${opts(CATS, p.category)}</select></td>
+    <td><input class="p" type="number" step="0.01" min="0.5" value="${p.price_pence ? (p.price_pence / 100).toFixed(2) : ''}"></td>
+    <td><select class="s">${opts(STOCK, p.stock_status)}</select></td>
+    <td><input class="a" type="checkbox" ${p.active !== false ? 'checked' : ''}></td>
+    <td><button class="sv">${isNew ? 'Add' : 'Save'}</button> ${isNew ? '' : '<button class="dl">Delete</button>'}</td></tr>`;
+}
+async function load() {
+  const list = await api('/api/admin/products');
+  $('#rows').innerHTML = rowHtml({}) + list.map(rowHtml).join('');
+  $('#login').style.display = 'none'; $('#dash').style.display = 'block';
+}
+$('#rows').addEventListener('click', async e => {
+  const tr = e.target.closest('tr'); if (!tr) return;
+  const id = tr.dataset.id;
+  try {
+    if (e.target.classList.contains('sv')) {
+      const body = { name: tr.querySelector('.n').value, category: tr.querySelector('.c').value,
+        price_pence: Math.round(parseFloat(tr.querySelector('.p').value) * 100),
+        stock_status: tr.querySelector('.s').value, active: tr.querySelector('.a').checked };
+      await api(id ? '/api/admin/products?id=' + encodeURIComponent(id) : '/api/admin/products', id ? 'PATCH' : 'POST', body);
+      await load(); say(id ? 'Saved.' : 'Product added.', true);
+    } else if (e.target.classList.contains('dl') && confirm('Delete this product permanently?')) {
+      await api('/api/admin/products?id=' + encodeURIComponent(id), 'DELETE');
+      await load(); say('Deleted.', true);
+    }
+  } catch (err) { if (err.status === 401) location.reload(); else say(err.message); }
+});
+$('#loginBtn').onclick = async () => {
+  try { await api('/api/admin/login', 'POST', { password: $('#pw').value }); $('#pw').value = ''; await load(); }
+  catch (err) { $('#loginErr').textContent = err.message; }
+};
+$('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#loginBtn').click(); });
+$('#logoutBtn').onclick = async () => { await api('/api/admin/logout', 'POST'); location.reload(); };
+load().catch(() => {});  // already logged in? show dashboard; otherwise stay on login
+</script>
+</body>
+</html>
