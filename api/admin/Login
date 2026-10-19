@@ -1,0 +1,12 @@
+const crypto = require('crypto');
+const { makeToken } = require('../_lib');
+module.exports = (req, res) => {
+  if (req.method !== 'POST') return res.status(405).end();
+  const a = Buffer.from(String((req.body || {}).password || ''));
+  const b = Buffer.from(process.env.ADMIN_PASSWORD || '');
+  if (!b.length || a.length !== b.length || !crypto.timingSafeEqual(a, b))
+    return res.status(401).json({ error: 'Wrong password' });
+  res.setHeader('Set-Cookie', `vd_admin=${makeToken()}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`);
+  res.json({ ok: true });
+};
+ 
