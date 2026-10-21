@@ -33,7 +33,7 @@
   <button id="loginBtn" style="width:100%">Log in</button>
   <p id="loginErr" class="err" style="margin-top:12px"></p>
 </div>
-
+ 
 <div id="dash">
   <div class="top"><h1>Shop Products</h1><div><a href="shop.html" style="color:var(--muted);margin-right:16px">View shop</a><button id="logoutBtn">Log out</button></div></div>
   <p id="msg"></p>
@@ -42,21 +42,21 @@
     <tbody id="rows"></tbody>
   </table>
 </div>
-
+ 
 <script>
 const $ = s => document.querySelector(s);
 const CATS = ['Apparel','Accessories','Stickers'], STOCK = ['In Stock','Low Stock','Sold Out'];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const opts = (arr, sel) => arr.map(o => `<option${o === sel ? ' selected' : ''}>${o}</option>`).join('');
-
+ 
 async function api(url, method = 'GET', body) {
   const r = await fetch(url, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw Object.assign(new Error(d.error || 'Request failed'), { status: r.status });
+  if (!r.ok) throw Object.assign(new Error(d.error || 'Request failed (HTTP ' + r.status + ')'), { status: r.status });
   return d;
 }
 function say(t, ok) { $('#msg').className = ok ? 'ok' : 'err'; $('#msg').textContent = t; }
-
+ 
 function rowHtml(p) {
   const isNew = !p.id;
   return `<tr data-id="${esc(p.id || '')}" class="${isNew ? 'new' : ''}">
