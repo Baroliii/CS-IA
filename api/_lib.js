@@ -1,14 +1,12 @@
-
-// Shared helpers (the leading underscore stops Vercel exposing this as a route)
 const crypto = require('crypto');
 const KEY = (process.env.SUPABASE_SERVICE_KEY || '').trim();
-// Tolerate a pasted URL with a trailing slash or '/rest/v1' on the end
+
 const BASE = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '');
  
 async function db(path, opts = {}) {
   const r = await fetch(BASE + '/rest/v1' + path, {
     ...opts,
-    headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', Prefer: 'return=representation', ...(opts.headers || {}) },
   });
   const t = await r.text();
   if (!r.ok) throw new Error(t);
@@ -17,7 +15,6 @@ async function db(path, opts = {}) {
  
 const sign = v => crypto.createHmac('sha256', process.env.SESSION_SECRET).update(v).digest('hex');
  
-// Session token = expiry timestamp + HMAC signature. Can't be forged without SESSION_SECRET.
 function makeToken() { const exp = Date.now() + 8 * 3600 * 1000; return exp + '.' + sign(String(exp)); }
  
 function isAdmin(req) {
