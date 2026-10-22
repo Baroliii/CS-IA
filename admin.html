@@ -22,6 +22,7 @@
   td{padding:6px 8px;border-top:1px solid var(--border);} td:nth-child(5){text-align:center;} td:last-child{white-space:nowrap;}
   tr.new td{background:rgba(0,200,255,.05);}
   #msg{min-height:22px;margin-bottom:12px;font-size:14px;} .err{color:#ff6b6b;} .ok{color:var(--accent);}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;} .tab.on{background:var(--accent);color:var(--bg);}
   #dash{display:none;}
 </style>
 </head>
@@ -36,11 +37,13 @@
  
 <div id="dash">
   <div class="top"><h1>Shop Products</h1><div><a href="shop.html" style="color:var(--muted);margin-right:16px">View shop</a><button id="logoutBtn">Log out</button></div></div>
+  <div class="tabs"><button class="tab on" data-tab="products">Products</button><button class="tab" data-tab="news">News</button><button class="tab" data-tab="sponsors">Sponsors</button></div>
   <p id="msg"></p>
-  <table>
+  <table id="prodTable">
     <thead><tr><th>Name</th><th>Category</th><th>Price (£)</th><th>Stock</th><th>Live</th><th></th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
+  <table id="contentTable" style="display:none"><thead id="chead"></thead><tbody id="crows"></tbody></table>
 </div>
  
 <script>
@@ -94,7 +97,47 @@ $('#loginBtn').onclick = async () => {
 };
 $('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#loginBtn').click(); });
 $('#logoutBtn').onclick = async () => { await api('/api/admin/logout', 'POST'); location.reload(); };
+ 
+const TIERS = ['Title Partner','Principal Partners','Technical Partners'];
+const TYPES = { news: { cols: [['tag','Tag'],['title','Headline'],['date_label','Date']] },
+                sponsors: { cols: [['name','Name'],['tier','Tier',TIERS]] } };
+let tab = 'products';
+function cRow(t, p) {
+  const isNew = !p.id;
+  return `<tr data-id="${esc(p.id || '')}" class="${isNew ? 'new' : ''}">` +
+    TYPES[t].cols.map(([k, , o]) => `<td>${o ? `<select data-k="${k}">${opts(o, p[k])}</select>` : `<input data-k="${k}" value="${esc(p[k] || '')}">`}</td>`).join('') +
+    `<td><input class="a" type="checkbox" ${p.active !== false ? 'checked' : ''}></td><td><button class="sv">${isNew ? 'Add' : 'Save'}</button> ${isNew ? '' : '<button class="dl">Delete</button>'}</td></tr>`;
+}
+async function loadContent(t) {
+  const list = await api('/api/admin/content?type=' + t);
+  $('#chead').innerHTML = '<tr>' + TYPES[t].cols.map(c => `<th>${c[1]}</th>`).join('') + '<th>Live</th><th></th></tr>';
+  $('#crows').innerHTML = cRow(t, {}) + list.map(p => cRow(t, p)).join('');
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = async () => {
+  tab = b.dataset.tab;
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
+  $('#prodTable').style.display = tab === 'products' ? '' : 'none';
+  $('#contentTable').style.display = tab === 'products' ? 'none' : '';
+  $('#msg').textContent = '';
+  try { tab === 'products' ? await load() : await loadContent(tab); } catch (e) { say(e.message); }
+});
+$('#crows').addEventListener('click', async e => {
+  const tr = e.target.closest('tr'); if (!tr) return;
+  const id = tr.dataset.id;
+  try {
+    if (e.target.classList.contains('sv')) {
+      const body = { active: tr.querySelector('.a').checked };
+      tr.querySelectorAll('[data-k]').forEach(el => body[el.dataset.k] = el.value);
+      await api('/api/admin/content?type=' + tab + (id ? '&id=' + encodeURIComponent(id) : ''), id ? 'PATCH' : 'POST', body);
+      await loadContent(tab); say(id ? 'Saved.' : 'Added.', true);
+    } else if (e.target.classList.contains('dl') && confirm('Delete permanently?')) {
+      await api('/api/admin/content?type=' + tab + '&id=' + encodeURIComponent(id), 'DELETE');
+      await loadContent(tab); say('Deleted.', true);
+    }
+  } catch (err) { if (err.status === 401) location.reload(); else say(err.message); }
+});
 load().catch(() => {});  // already logged in? show dashboard; otherwise stay on login
 </script>
 </body>
 </html>
+ 
