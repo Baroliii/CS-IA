@@ -1,8 +1,8 @@
 // Admin-only CRUD. Every request must carry a valid signed session cookie.
-const { db, isAdmin } = require('../_lib');
+const { db, isAdmin, BASE } = require('../_lib');
 const CATS = ['Apparel', 'Accessories', 'Stickers'];
 const STOCK = ['In Stock', 'Low Stock', 'Sold Out'];
-
+ 
 // Validate everything server-side; never trust the browser.
 function clean(b = {}) {
   const p = {};
@@ -15,10 +15,15 @@ function clean(b = {}) {
   }
   if (b.stock_status !== undefined) { if (!STOCK.includes(b.stock_status)) throw new Error('Bad stock status'); p.stock_status = b.stock_status; }
   if (b.active !== undefined) p.active = !!b.active;
+  if (b.image_url !== undefined) {
+    const u = String(b.image_url);
+    if (u && !u.startsWith(BASE + '/storage/v1/object/public/product-images/')) throw new Error('Bad image URL');
+    p.image_url = u || null;
+  }
   if (p.name === '') throw new Error('Name required');
   return p;
 }
-
+ 
 module.exports = async (req, res) => {
   if (!isAdmin(req)) return res.status(401).json({ error: 'Not logged in' });
   try {
@@ -35,3 +40,4 @@ module.exports = async (req, res) => {
     res.status(405).end();
   } catch (e) { res.status(400).json({ error: e.message }); }
 };
+ 
