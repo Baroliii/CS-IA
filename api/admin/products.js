@@ -1,6 +1,6 @@
 // Admin-only CRUD. Every request must carry a valid signed session cookie.
 const { db, isAdmin, BASE } = require('../_lib');
-const CATS = ['Apparel', 'Accessories', 'Stickers'];
+const CATS = ['Apparel', 'Keychains', 'Coasters', 'Stationery', 'Accessories', 'Stickers'];
 const STOCK = ['In Stock', 'Low Stock', 'Sold Out'];
  
 // Validate everything server-side; never trust the browser.
@@ -10,14 +10,15 @@ function clean(b = {}) {
   if (b.category !== undefined) { if (!CATS.includes(b.category)) throw new Error('Bad category'); p.category = b.category; }
   if (b.price_pence !== undefined) {
     const n = Math.round(Number(b.price_pence));
-    if (!(n >= 50 && n <= 100000)) throw new Error('Price must be £0.50 to £1000');
+    if (!(n >= 50 && n <= 100000)) throw new Error('Price must be €0.50 to €1000');
     p.price_pence = n;
   }
   if (b.stock_status !== undefined) { if (!STOCK.includes(b.stock_status)) throw new Error('Bad stock status'); p.stock_status = b.stock_status; }
   if (b.active !== undefined) p.active = !!b.active;
   if (b.image_url !== undefined) {
     const u = String(b.image_url);
-    if (u && !u.startsWith(BASE + '/storage/v1/object/public/product-images/')) throw new Error('Bad image URL');
+    const ok = u.startsWith(BASE + '/storage/v1/object/public/product-images/') || u.startsWith('images/products/');
+    if (u && !ok) throw new Error('Bad image URL');
     p.image_url = u || null;
   }
   if (p.name === '') throw new Error('Name required');
