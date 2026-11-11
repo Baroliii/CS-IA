@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
 <title>Admin — Veloce Dynamics</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root{--accent:#00C8FF;--bg:#080809;--bg2:#0f0f12;--muted:#8888a0;--border:rgba(255,255,255,.1);}
@@ -38,7 +41,7 @@
  
 <div id="dash">
   <div class="top"><h1>Shop Products</h1><div><a href="shop.html" style="color:var(--muted);margin-right:16px">View shop</a><button id="logoutBtn">Log out</button></div></div>
-  <div class="tabs"><button class="tab on" data-tab="products">Products</button><button class="tab" data-tab="news">News</button><button class="tab" data-tab="sponsors">Sponsors</button></div>
+  <div class="tabs"><button class="tab on" data-tab="products">Products</button><button class="tab" data-tab="news">News</button><button class="tab" data-tab="sponsors">Sponsors</button><button class="tab" data-tab="team">Team</button><button class="tab" data-tab="site_images">Site images</button></div>
   <p id="msg"></p>
   <table id="prodTable">
     <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price (€)</th><th>Stock</th><th>Live</th><th></th></tr></thead>
@@ -127,20 +130,39 @@ $('#rows').addEventListener('change', async e => {
   } catch (err) { if (err.status === 401) location.reload(); else say(err.message); }
 });
 const TIERS = ['Title Partner','Principal Partners','Technical Partners'];
-const TYPES = { news: { cols: [['tag','Tag'],['title','Headline'],['date_label','Date']] },
-                sponsors: { cols: [['name','Name'],['tier','Tier',TIERS]] } };
+const SLOT_NAMES = { hero1: 'Hero slide 1', hero2: 'Hero slide 2', hero3: 'Hero slide 3', about: 'About section' };
+const TYPES = { news: { cols: [['image_url','Image'],['tag','Tag'],['title','Headline'],['date_label','Date']], max: 1200 },
+                sponsors: { cols: [['name','Name'],['tier','Tier',TIERS]] },
+                team: { cols: [['image_url','Photo'],['name','Name'],['role','Role'],['info','Details']], max: 1200 },
+                site_images: { cols: [['key','Slot'],['image_url','Image']], fixed: true, max: 1920 } };
+function cell(t, k, o, p) {
+  if (k === 'image_url') return `<td><img class="th" ${p.image_url ? `src="${esc(p.image_url)}"` : 'style="display:none"'} alt=""><input class="f" type="file" accept="image/*"> <button class="rm" type="button">Remove</button></td>`;
+  if (TYPES[t].fixed && k === 'key') return `<td>${esc(SLOT_NAMES[p.key] || p.key)}</td>`;
+  return `<td>${o ? `<select data-k="${k}">${opts(o, p[k])}</select>` : `<input data-k="${k}" value="${esc(p[k] || '')}">`}</td>`;
+}
 let tab = 'products';
 function cRow(t, p) {
-  const isNew = !p.id;
-  return `<tr data-id="${esc(p.id || '')}" class="${isNew ? 'new' : ''}">` +
-    TYPES[t].cols.map(([k, , o]) => `<td>${o ? `<select data-k="${k}">${opts(o, p[k])}</select>` : `<input data-k="${k}" value="${esc(p[k] || '')}">`}</td>`).join('') +
-    `<td><input class="a" type="checkbox" ${p.active !== false ? 'checked' : ''}></td><td><button class="sv">${isNew ? 'Add' : 'Save'}</button> ${isNew ? '' : '<button class="dl">Delete</button>'}</td></tr>`;
+  const T = TYPES[t], isNew = !p.id && !p.key;
+  return `<tr data-id="${esc(p.id || p.key || '')}" data-img="${esc(p.image_url || '')}" class="${isNew ? 'new' : ''}">` +
+    T.cols.map(([k, , o]) => cell(t, k, o, p)).join('') +
+    (T.fixed ? '' : `<td><input class="a" type="checkbox" ${p.active !== false ? 'checked' : ''}></td>`) +
+    `<td><button class="sv">${isNew ? 'Add' : 'Save'}</button> ${isNew || T.fixed ? '' : '<button class="dl">Delete</button>'}</td></tr>`;
 }
 async function loadContent(t) {
-  const list = await api('/api/admin/content?type=' + t);
-  $('#chead').innerHTML = '<tr>' + TYPES[t].cols.map(c => `<th>${c[1]}</th>`).join('') + '<th>Live</th><th></th></tr>';
-  $('#crows').innerHTML = cRow(t, {}) + list.map(p => cRow(t, p)).join('');
+  const T = TYPES[t], list = await api('/api/admin/content?type=' + t);
+  $('#chead').innerHTML = '<tr>' + T.cols.map(c => `<th>${c[1]}</th>`).join('') + (T.fixed ? '' : '<th>Live</th>') + '<th></th></tr>';
+  $('#crows').innerHTML = (T.fixed ? '' : cRow(t, {})) + list.map(p => cRow(t, p)).join('');
 }
+$('#crows').addEventListener('change', async e => {
+  if (!e.target.classList.contains('f') || !e.target.files[0]) return;
+  const tr = e.target.closest('tr');
+  try {
+    say('Uploading…', true);
+    const r = await api('/api/admin/upload', 'POST', { data: await resizeToJpeg(e.target.files[0], TYPES[tab].max || 1200) });
+    tr.dataset.img = r.url; const t = tr.querySelector('.th'); t.src = r.url; t.style.display = '';
+    say('Image uploaded — click Save to apply it.', true);
+  } catch (err) { if (err.status === 401) location.reload(); else say(err.message); }
+});
 document.querySelectorAll('.tab').forEach(b => b.onclick = async () => {
   tab = b.dataset.tab;
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
@@ -154,10 +176,14 @@ $('#crows').addEventListener('click', async e => {
   const id = tr.dataset.id;
   try {
     if (e.target.classList.contains('sv')) {
-      const body = { active: tr.querySelector('.a').checked };
+      const a = tr.querySelector('.a'), body = a ? { active: a.checked } : {};
       tr.querySelectorAll('[data-k]').forEach(el => body[el.dataset.k] = el.value);
+      if (TYPES[tab].cols.some(c => c[0] === 'image_url')) body.image_url = tr.dataset.img || '';
       await api('/api/admin/content?type=' + tab + (id ? '&id=' + encodeURIComponent(id) : ''), id ? 'PATCH' : 'POST', body);
       await loadContent(tab); say(id ? 'Saved.' : 'Added.', true);
+    } else if (e.target.classList.contains('rm')) {
+      tr.dataset.img = ''; const t = tr.querySelector('.th'); t.removeAttribute('src'); t.style.display = 'none';
+      say('Image removed — click Save to apply.', true);
     } else if (e.target.classList.contains('dl') && confirm('Delete permanently?')) {
       await api('/api/admin/content?type=' + tab + '&id=' + encodeURIComponent(id), 'DELETE');
       await loadContent(tab); say('Deleted.', true);
