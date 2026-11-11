@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec((req.body || {}).data || '');
     if (!m) throw new Error('Image must be a JPEG');
     const buf = Buffer.from(m[1], 'base64');
-    if (buf.length > 1.5 * 1024 * 1024) throw new Error('Image too large (max 1.5 MB)');
+    if (buf.length > 3 * 1024 * 1024) throw new Error('Image too large (max 3 MB)');
     if (buf[0] !== 0xFF || buf[1] !== 0xD8) throw new Error('Not a valid JPEG');   // check real file signature
     const name = Date.now() + '-' + crypto.randomBytes(4).toString('hex') + '.jpg';
     const r = await fetch(`${BASE}/storage/v1/object/product-images/${name}`, {
