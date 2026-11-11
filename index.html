@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Veloce Dynamics — STEM Racing</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -732,6 +735,11 @@
     .comp-grid{grid-template-columns:1fr;}
     .footer-top{grid-template-columns:1fr;} footer{padding:48px 20px 28px;}
   }
+  .nav-logo-img{height:36px;width:auto;display:block;}
+  .nav-logo .nav-logo-sub{border-left:1px solid var(--border);padding-left:12px;margin-top:0;line-height:1.4;}
+  @media (max-width:600px){ .nav-logo .nav-logo-sub{display:none;} .nav-logo-img{height:32px;} }
+  /* darker overlay when a hero slide uses a real photo, so text and menu stay readable */
+  .hero-bg.has-photo::after{background:linear-gradient(to right, rgba(8,8,9,0.8) 0%, rgba(8,8,9,0.2) 70%), linear-gradient(to top, rgba(8,8,9,0.95) 0%, rgba(8,8,9,0.35) 50%, rgba(8,8,9,0.6) 100%);}
 </style>
 </head>
 <body>
@@ -739,11 +747,7 @@
 <!-- NAV -->
 <nav id="navbar">
   <a href="#" class="nav-logo">
-    <div class="nav-logo-mark"></div>
-    <div>
-      <div class="nav-logo-text">Veloce Dynamics</div>
-      <div class="nav-logo-sub">STEM Racing Team</div>
-    </div>
+    <img src="images/logo.svg" alt="Veloce Dynamics" class="nav-logo-img"><span class="nav-logo-sub">STEM Racing Team</span>
   </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
@@ -1077,11 +1081,7 @@
   <div class="footer-top">
     <div class="footer-brand">
       <a href="#" class="nav-logo" style="display:inline-flex;">
-        <div class="nav-logo-mark"></div>
-        <div>
-          <div class="nav-logo-text">Veloce Dynamics</div>
-          <div class="nav-logo-sub">STEM Racing Team</div>
-        </div>
+        <img src="images/logo.svg" alt="Veloce Dynamics" class="nav-logo-img"><span class="nav-logo-sub">STEM Racing Team</span>
       </a>
       <p>A student-led STEM racing team competing at national level, built on engineering excellence and a relentless drive to innovate.</p>
     </div>
@@ -1192,12 +1192,12 @@
   (async function () {
     try {
       const r = await fetch('/api/content'); if (!r.ok) return;
-      const { news, sponsors } = await r.json();
+      const { news, sponsors, team, images } = await r.json();
       const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       if (news && news.length) {
         const grid = document.getElementById('newsGrid');
         const car = (grid.querySelector('.ph-graphic') || {}).outerHTML || '';
-        grid.innerHTML = news.slice(0, 5).map((n, i) => `<a href="#" class="news-card"><div class="news-card-img-placeholder ph-${(i % 4) + 1}"${i ? ' style="aspect-ratio:16/9;"' : ''}>${i ? '' : car}</div><div class="news-card-body"><span class="news-tag">${esc(n.tag || '')}</span><h3 class="news-card-title">${esc(n.title)}</h3><span class="news-date">${esc(n.date_label || '')}</span></div></a>`).join('');
+        grid.innerHTML = news.slice(0, 5).map((n, i) => `<a href="#" class="news-card"><div class="news-card-img-placeholder ph-${(i % 4) + 1}" style="${i ? 'aspect-ratio:16/9;' : ''}${n.image_url ? `background:url('${esc(n.image_url)}') center/cover;` : ''}">${i || n.image_url ? '' : car}</div><div class="news-card-body"><span class="news-tag">${esc(n.tag || '')}</span><h3 class="news-card-title">${esc(n.title)}</h3><span class="news-date">${esc(n.date_label || '')}</span></div></a>`).join('');
       }
       if (sponsors && sponsors.length) {
         const sec = document.getElementById('sponsors');
@@ -1208,6 +1208,13 @@
           sec.insertAdjacentHTML('beforeend', `<div class="sponsors-tier"><div class="sponsors-tier-label">${tier}</div><div class="sponsors-row">${list.map(x => `<div class="sponsor-item"${big ? ' style="min-width:200px;border-color:rgba(0,200,255,0.25);"' : ''}><span class="sponsor-name"${big ? ' style="color:rgba(0,200,255,0.7);font-size:18px;"' : ''}>${esc(x.name)}</span></div>`).join('')}</div></div>`);
         });
       }
+      if (team && team.length) {
+        document.querySelector('.team-grid').innerHTML = team.map((m, i) => `<div class="team-card"><div class="team-card-bg tc-${(i % 3) + 1}"${m.image_url ? ` style="background:url('${esc(m.image_url)}') center/cover"` : ''}></div><div class="team-card-number">${String(i + 1).padStart(2, '0')}</div><div class="team-card-body"><p class="team-role">${esc(m.role)}</p><h3 class="team-name">${esc(m.name)}</h3><p class="team-info">${esc(m.info)}</p></div><div class="team-accent-bar"></div></div>`).join('');
+      }
+      // section photos: hero slides and the About picture (gradients stay as fallback)
+      const pics = Object.fromEntries((images || []).filter(x => x.image_url).map(x => [x.key, x.image_url]));
+      document.querySelectorAll('.hero-slide .hero-bg').forEach((bg, i) => { const u = pics['hero' + (i + 1)]; if (u) { bg.style.backgroundImage = `url('${u}')`; bg.classList.add('has-photo'); } });
+      if (pics.about) document.querySelector('.about-visual-inner').innerHTML = `<img src="${esc(pics.about)}" alt="Veloce Dynamics" style="width:100%;height:100%;object-fit:cover">`;
     } catch (e) {}
   })();
 </script>
