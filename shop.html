@@ -191,7 +191,7 @@
   <div class="cart-foot">
     <div class="cart-subtotal">
       <span class="cart-subtotal-label">Subtotal</span>
-      <span class="cart-subtotal-val" id="cartSubtotal">£0</span>
+      <span class="cart-subtotal-val" id="cartSubtotal">€0</span>
     </div>
     <p class="checkout-error" id="checkoutError"></p>
     <button class="checkout-btn" id="checkoutBtn">Checkout</button>
@@ -318,19 +318,19 @@
   document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
   cartOverlay.addEventListener('click', closeCart);
  
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const f = btn.dataset.filter;
-      document.querySelectorAll('.product-card').forEach(card => {
-        card.style.display = (f === 'all' || card.dataset.cat === f) ? '' : 'none';
-      });
+  // Filter buttons are created from the categories that actually have products
+  document.querySelector('.shop-filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn'); if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.display = (f === 'all' || card.dataset.cat === f) ? '' : 'none';
     });
   });
  
   const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function fmt(n) { return '£' + n.toFixed(2).replace(/\.00$/, ''); }
+  function fmt(n) { return '€' + n.toFixed(2).replace(/\.00$/, ''); }
  
   async function loadProducts() {
     const grid = document.getElementById('productGrid');
@@ -346,6 +346,8 @@
             <div class="product-bottom"><span class="product-price">${fmt(price)}</span>
               <button class="add-btn" data-id="${esc(p.id)}" data-name="${esc(p.name)}" data-price="${price}"${sold ? ' disabled' : ''}>+</button></div></div></div>`;
       }).join('') || '<p style="color:#8888a0">No products available yet.</p>';
+      const cats = [...new Set(list.map(p => p.category))];
+      document.querySelector('.shop-filters').innerHTML = ['all', ...cats].map(c => `<button class="filter-btn${c === 'all' ? ' active' : ''}" data-filter="${esc(c)}">${c === 'all' ? 'All' : esc(c)}</button>`).join('');
       // keep saved carts in step with current names/prices; drop removed items
       cart = cart.filter(i => list.some(p => p.id === i.id)).map(i => { const p = list.find(x => x.id === i.id); return { ...i, name: p.name, price: p.price_pence / 100 }; });
       saveCart();
