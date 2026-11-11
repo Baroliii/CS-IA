@@ -41,7 +41,7 @@
   <div class="tabs"><button class="tab on" data-tab="products">Products</button><button class="tab" data-tab="news">News</button><button class="tab" data-tab="sponsors">Sponsors</button></div>
   <p id="msg"></p>
   <table id="prodTable">
-    <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price (£)</th><th>Stock</th><th>Live</th><th></th></tr></thead>
+    <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price (€)</th><th>Stock</th><th>Live</th><th></th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
   <table id="contentTable" style="display:none"><thead id="chead"></thead><tbody id="crows"></tbody></table>
@@ -49,7 +49,7 @@
  
 <script>
 const $ = s => document.querySelector(s);
-const CATS = ['Apparel','Accessories','Stickers'], STOCK = ['In Stock','Low Stock','Sold Out'];
+const CATS = ['Apparel','Keychains','Coasters','Stationery','Accessories','Stickers'], STOCK = ['In Stock','Low Stock','Sold Out'];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const opts = (arr, sel) => arr.map(o => `<option${o === sel ? ' selected' : ''}>${o}</option>`).join('');
  
